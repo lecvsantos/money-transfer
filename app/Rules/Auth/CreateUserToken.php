@@ -10,14 +10,18 @@ class CreateUserToken
 {
     public function execute($payload)
     {
-        $user = User::where('email', $payload["email"])->first();
+        try {
+            $user = User::where('email', $payload["email"])->first();
 
-        if (!$user || !Hash::check($payload["password"], $user["password"])) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+            if (!$user || !Hash::check($payload["password"], $user["password"])) {
+                throw ValidationException::withMessages([
+                    'email' => ['The provided credentials are incorrect.'],
+                ]);
+            }
+    
+            return ["access_token" => $user->createToken("user-token")->plainTextToken];
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
         }
-
-        return ["access_token" => $user->createToken("user-token")->plainTextToken];
     }
 }
