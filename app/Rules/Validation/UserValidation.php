@@ -34,8 +34,8 @@ class UserValidation
                 "nullable",
                 Rule::in(["USER", "SHOPKEEPER"]),
             ],
-            "page" => "sometimes",
-            "page_size" => "sometimes"
+            "page" => "nullable",
+            "page_size" => "nullable"
         ];
     }
 }

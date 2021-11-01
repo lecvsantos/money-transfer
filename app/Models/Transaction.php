@@ -40,4 +40,9 @@ class Transaction extends Model
     {
         return $this->belongsTo('App\Models\User');
     }
+
+    public function wallet()
+    {
+        return $this->hasMany('App\Models\Wallet');
+    }
 }

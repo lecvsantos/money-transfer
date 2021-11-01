@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\WalletController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,5 +26,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(["prefix" => "transaction"], function () {
         Route::post('/', [TransactionController::class, 'store']);
         Route::get('/{id}', [TransactionController::class, 'show']);
+        Route::get('/', [TransactionController::class, 'index']);
+        Route::delete('/{id}', [TransactionController::class, 'destroy']);
+    });
+
+    Route::group(["prefix" => "wallet"], function () {
+        Route::get('/', [WalletController::class, 'index']);
     });
 });

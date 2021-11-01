@@ -2,14 +2,14 @@
 
 namespace App\Rules\Transaction;
 
-use App\Models\User;
 use App\Models\Transaction;
+use App\Models\User;
+use App\Rules\Integration\Notify\NotifyPayee;
+use App\Rules\Integration\Transaction\AuthorizeTransaction;
+use App\Rules\Wallet\CreateWalletByTransaction;
 use App\Rules\Wallet\Extract;
 use Illuminate\Support\Facades\DB;
-use App\Rules\Integration\Notify\NotifyPayee;
-use App\Rules\Wallet\CreateWalletByTransaction;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use App\Rules\Integration\Transaction\AuthorizeTransaction;
 
 class CreateTransaction
 {
@@ -17,7 +17,7 @@ class CreateTransaction
     {
         // verifica se o usuario pode realizar transferencias para outro
         if ($this->verifyPayer($payload["payer_id"])) {
-            
+
             // Busca o saldo do usuario pagador
             $extract = (new Extract)->execute($payload["payer_id"], true);
 
@@ -50,6 +50,7 @@ class CreateTransaction
                 DB::commit();
                 return $transaction;
             } else {
+                DB::rollBack();
                 throw new HttpException(422, "Balance Unavailable");
             }
         } else {
