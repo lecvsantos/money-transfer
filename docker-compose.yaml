@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+    #PHP Service
+    app:
+      build: .
+      container_name: money_transfer_app
+      restart: unless-stopped
+      #ports:
+      #  - "8000:8000"
+      environment:
+        SERVICE_NAME: app
+        SERVICE_TAGS: dev
+      working_dir: /var/www
+      volumes:
+        - ./:/var/www
+        - .docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      networks:
+        - app-network
+
+    #Nginx Service
+    webserver-app:
+      image: nginx:alpine
+      container_name: money_transfer_webserver
+      restart: unless-stopped
+      tty: true
+      ports:
+        - "8080:80"
+        - "443:443"
+      volumes:
+        - ./:/var/www
+        - .docker/nginx/conf.d/:/etc/nginx/conf.d/
+      networks:
+        - app-network
+
+    db:
+      container_name: money_transfer_db
+      image: mysql:8.0.27
+      platform: linux/amd64
+      restart: always
+      command: --default-authentication-plugin=mysql_native_password
+      ports:
+        - "3306:3306"
+      environment:
+        MYSQL_DATABASE: laravel_money_transfer
+        MYSQL_ROOT_USER: root
+        MYSQL_ROOT_PASSWORD: root
+      volumes:
+        - ./.docker/mysql/dbdata:/var/lib/mysql
+      networks:
+        - app-network
+
+networks:
+  app-network:
+    driver: bridge
